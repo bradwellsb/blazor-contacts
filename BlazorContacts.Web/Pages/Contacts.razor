@@ -1,0 +1,42 @@
+﻿@page "/contacts"
+@inject Services.ApiService apiService
+@using BlazorContacts.Shared.Models
+
+<h3>Contacts</h3>
+@if (contacts == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Phone Number</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var contact in contacts)
+            {
+                <tr>
+                    <td>@contact.Id</td>
+                    <td>@contact.Name</td>
+                    <td>@contact.PhoneNumber</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    List<Contact> contacts;
+
+    protected override async Task OnInitializedAsync()
+    {
+        contacts = await apiService.GetContactsAsync();
+        Contact contact3 = await apiService.GetContactByIdAsync(3);
+    }
+}
+
