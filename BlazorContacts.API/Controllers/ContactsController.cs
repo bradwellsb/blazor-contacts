@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using BlazorContacts.Shared.Models;
@@ -10,6 +11,7 @@ namespace BlazorContacts.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ContactsController : ControllerBase
     {
         private static readonly List<Contact> contacts = GenerateContacts(5);
@@ -19,7 +21,7 @@ namespace BlazorContacts.API.Controllers
             {
                 Id = index,
                 Name = $"First{index} Last{index}",
-                PhoneNumber = $"+1 555 987{index}",
+                PhoneNumber = $"+1 555 {index}{index}{index} 987{index}",
             }).ToList();
         }
 

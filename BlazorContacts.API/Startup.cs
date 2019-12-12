@@ -26,6 +26,15 @@ namespace BlazorContacts.API
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+
+            services.AddAuthentication("Bearer")
+              .AddJwtBearer("Bearer", options =>
+              {
+                  options.Authority = "http://localhost:5000";
+                  options.RequireHttpsMetadata = false;
+
+                  options.Audience = "blazorcontacts-api";
+              });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -40,6 +49,7 @@ namespace BlazorContacts.API
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
