@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using IdentityModel.AspNetCore;
 using IdentityModel.Client;
 
 namespace BlazorContacts.Web
@@ -30,18 +29,9 @@ namespace BlazorContacts.Web
             services.AddHttpClient<Services.ApiService>(client =>
             {
                 client.BaseAddress = new Uri("http://localhost:5001");
-            })
-                .AddClientAccessTokenHandler();
-
-            services.AddAccessTokenManagement(options =>
-            {
-                options.Client.Clients.Add("auth", new TokenClientOptions
-                {
-                    Address = "http://localhost:5000/connect/token",
-                    ClientId = "blazorcontacts-web",
-                    ClientSecret = "thisismyclientspecificsecret"
-                });
             });
+
+            services.AddSingleton<Services.ApiTokenCacheService>();
 
             services.AddRazorPages();
             services.AddServerSideBlazor();
