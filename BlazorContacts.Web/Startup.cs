@@ -29,9 +29,20 @@ namespace BlazorContacts.Web
             services.AddHttpClient<Services.ApiService>(client =>
             {
                 client.BaseAddress = new Uri("http://localhost:5001");
+            })
+                .AddClientAccessTokenHandler();
+
+            services.AddAccessTokenManagement(options =>
+            {
+                options.Client.Clients.Add("auth", new TokenClientOptions
+                {
+                    Address = "http://localhost:5000/connect/token",
+                    ClientId = "blazorcontacts-web",
+                    ClientSecret = "thisismyclientspecificsecret"
+                });
             });
 
-            services.AddSingleton<Services.ApiTokenCacheService>();
+            //services.AddSingleton<Services.ApiTokenCacheService>();
 
             services.AddRazorPages();
             services.AddServerSideBlazor();
