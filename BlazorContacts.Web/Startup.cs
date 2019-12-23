@@ -35,7 +35,7 @@ namespace BlazorContacts.Web
 
             services.AddAccessTokenManagement(options =>
             {
-                options.Client.Clients.Add("auth", new TokenClientOptions
+                options.Client.Clients.Add("auth", new ClientCredentialsTokenRequest
                 {
                     Address = "http://localhost:5000/connect/token",
                     ClientId = "blazorcontacts-web",
