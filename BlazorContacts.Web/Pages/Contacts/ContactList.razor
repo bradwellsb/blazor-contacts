@@ -1,0 +1,130 @@
+﻿@inject Services.ApiService apiService
+@using BlazorContacts.Shared.Models
+@using Models
+
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-8"></div>
+            <div class="col-sm-4 text-right"><a href="/contact/create" class="btn btn-primary">New Contact</a></div>
+        </div>
+        @if (contacts == null)
+        {
+            <p><em>Loading...</em></p>
+        }
+        else
+        {
+            <div class="row">
+                <div class="col-sm-8">
+                    <h4>Showing @(skip + 1) - @(Math.Min(skip + ListPrefsProvider.listPrefs.NumResults, matchingCount)) of @matchingCount</h4>
+                </div>
+                <div class="col-sm-4 text-right">
+                    <div class="row form-group">
+                        <label for="sortBy" class="col-form-label col-form-label-sm col">Sort by:</label>
+                        <select id="sortBy" class="form-control form-control-sm" style="width:auto;" @onchange="ChangeOrder">
+                            <option value="Id" selected=@(ListPrefsProvider.listPrefs.OrderBy=="Id")>ID</option>
+                            <option value="Name" selected=@(ListPrefsProvider.listPrefs.OrderBy=="Name")>Name (A - Z)</option>
+                            <option value="Name desc" selected=@(ListPrefsProvider.listPrefs.OrderBy=="Name desc")>Name (Z - A)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <table class="col-12 table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Phone Number</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var contact in contacts)
+                        {
+                            <tr>
+                                <td>@contact.Id</td>
+                                <td><a href="/contact/@contact.Id">@contact.Name</a></td>
+                                <td>@contact.PhoneNumber</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="row">
+                <div class="col-sm-8">
+                    <button @onclick=PreviousPage class="btn btn-sm btn-outline-secondary" disabled=@(skip == 0)>
+                        <span class="oi oi-chevron-left" aria-hidden="true"></span> Prev
+                    </button>
+
+                    <span class="btn">Page @((skip / ListPrefsProvider.listPrefs.NumResults) + 1)</span>
+
+                    @if (ListPrefsProvider.listPrefs.NumResults + skip < matchingCount)
+                    {
+                        <button @onclick=NextPage class="btn btn-sm btn-outline-secondary">
+                            Next <span class="oi oi-chevron-right" aria-hidden="true"></span>
+                        </button>
+                    }
+                </div>
+                <div class="col-sm-4 text-right">
+                    <div class="row form-group">
+                        <label for="numResults" class="col-form-label col-form-label-sm col">Show:</label>
+                        <select id="numResults" class="form-control form-control-sm" style="width:auto;" @onchange="ChangeTop">
+                            <option value="10" selected=@(ListPrefsProvider.listPrefs.NumResults==10)>10</option>
+                            <option value="25" selected=@(ListPrefsProvider.listPrefs.NumResults==25)>25</option>
+                            <option value="50" selected=@(ListPrefsProvider.listPrefs.NumResults==50)>50</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+@code {
+    private List<Contact> contacts;
+    private int matchingCount;
+
+    [CascadingParameter]
+    private ContactListParent ListPrefsProvider { get; set; }
+
+    private int skip = 0;
+
+
+    private async Task FetchListAsync()
+    {
+        var response = await apiService.GetContactsAsync(ListPrefsProvider.listPrefs.OrderBy, skip, ListPrefsProvider.listPrefs.NumResults);
+        contacts = response.Contacts;
+        matchingCount = response.Count;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await FetchListAsync();
+    }
+
+    private async Task ChangeOrder(ChangeEventArgs e)
+    {
+        ListPrefsProvider.listPrefs.OrderBy = e.Value.ToString();
+        await ListPrefsProvider.SavePrefsAsync();
+        skip = 0; //back to first page
+        await FetchListAsync();
+    }
+
+    private async Task ChangeTop(ChangeEventArgs e)
+    {
+        ListPrefsProvider.listPrefs.NumResults = int.Parse(e.Value.ToString());
+        await ListPrefsProvider.SavePrefsAsync();
+        skip = 0; //back to first page
+        await FetchListAsync();
+    }
+
+    private async Task PreviousPage()
+    {
+        skip -= ListPrefsProvider.listPrefs.NumResults;
+        await FetchListAsync();
+    }
+
+    private async Task NextPage()
+    {
+        skip += ListPrefsProvider.listPrefs.NumResults;
+        await FetchListAsync();
+    }
+}

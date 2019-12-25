@@ -1,5 +1,9 @@
-﻿@page "/"
+﻿@using BlazorContacts.Web.Pages.Contacts
+@page "/"
 
-<h1>Hello, world!</h1>
+<h2>Your Contacts</h2>
 
-Welcome to your new app.
+<ContactListParent>
+    <ContactList />
+</ContactListParent>
+

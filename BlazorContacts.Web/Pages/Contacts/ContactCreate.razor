@@ -1,0 +1,44 @@
+﻿@page "/contact/create"
+@inject Services.ApiService apiService
+@using System.Text.Json
+@using BlazorContacts.Shared.Models
+
+<h3>New Contact</h3>
+<div style="max-width: 400px;">
+    <EditForm Model="@contact" OnValidSubmit="@PostContact">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="form-group row">
+            <label for="contactName" class="col-sm-6 col-form-label">Name:</label>
+            <input id="contactName" class="form-control col-sm-6 input-lg" type="text" disabled="@isSuccess"
+                   @bind="contact.Name" />
+        </div>
+        <div class="form-group row">
+            <label for="contactPhone" class="col-sm-6 col-form-label">Phone Number:</label>
+            <input id="contactPhone" class="form-control col-sm-6 input-lg" type="text" disabled="@isSuccess"
+                   @bind="contact.PhoneNumber" />
+        </div>
+        <button class="btn btn-primary" type="submit" disabled="@isSuccess">Submit</button>
+        <div class="alert @(isSuccess?"alert-success":"alert-danger")" style="margin-top:1rem" role="alert"
+             hidden="@(message=="")">@message</div>
+        </EditForm>
+    </div>
+    @code {
+        private Contact contact = new Contact();
+        private bool isSuccess = false;
+        private string message = "";
+
+        public async void PostContact()
+        {
+            //returns response message, so can check if success
+            var response = await apiService.CreateContactAsync(contact);
+            if (response.IsSuccessStatusCode)
+            {
+                isSuccess = true;
+                message = $"Success {response.Headers.Location}";
+            }
+            else
+                message = $"Error: {response.StatusCode.ToString()}. Please try again.";
+            this.StateHasChanged();
+        }
+    }

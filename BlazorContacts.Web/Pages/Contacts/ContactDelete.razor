@@ -1,0 +1,48 @@
+﻿@page "/contact/{Id:long}/delete"
+@inject Services.ApiService apiService
+@inject NavigationManager NavManager
+@using BlazorContacts.Web.Pages
+@using BlazorContacts.Shared.Models
+
+<h3>Are you sure you want to delete this?</h3>
+
+@if (contact == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-sm-4" style="background-color:lightgrey; padding:4px;">
+            <h4>@contact.Name</h4>
+            <h4>@contact.PhoneNumber</h4>
+        </div>
+    </div>
+    <div class="row" style="margin-top:1rem;">
+        <div class="col-12">
+            <button @onclick="OnDeleteButtonClick" class="btn btn-danger">Delete</button> |
+            <a href="/contact/@contact.Id">Return to Contact</a>
+        </div>
+    </div>
+}
+
+
+
+@code {
+    [Parameter]
+    public long Id { get; set; }
+
+    private Contact contact;
+
+    protected override async Task OnInitializedAsync()
+    {
+        contact = await apiService.GetContactByIdAsync(Id);
+    }
+
+    private async void OnDeleteButtonClick()
+    {
+
+        await apiService.DeleteContactByIdAsync(Id);
+        NavManager.NavigateTo("/");
+    }
+}

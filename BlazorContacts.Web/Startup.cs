@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using IdentityModel.Client;
+using Blazored.SessionStorage;
 
 namespace BlazorContacts.Web
 {
@@ -29,18 +30,21 @@ namespace BlazorContacts.Web
             services.AddHttpClient<Services.ApiService>(client =>
             {
                 client.BaseAddress = new Uri("http://localhost:5001");
+                
             })
-                .AddClientAccessTokenHandler();
+                .AddClientAccessTokenHandler("web");
 
             services.AddAccessTokenManagement(options =>
             {
-                options.Client.Clients.Add("auth", new TokenClientOptions
+                options.Client.Clients.Add("web", new ClientCredentialsTokenRequest
                 {
-                    Address = "http://localhost:5000/connect/token",
+                    RequestUri = new Uri("http://localhost:5000/connect/token"),
                     ClientId = "blazorcontacts-web",
                     ClientSecret = "thisismyclientspecificsecret"
                 });
             });
+
+            services.AddBlazoredSessionStorage();
 
             //services.AddSingleton<Services.ApiTokenCacheService>();
 
@@ -62,8 +66,10 @@ namespace BlazorContacts.Web
                 app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
             app.UseStaticFiles();
+
+            app.UseAuthentication();
 
             app.UseRouting();
 

@@ -1,0 +1,43 @@
+﻿@inject Services.ApiService apiService
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@using BlazorContacts.Shared.Models
+@using Models
+
+<div class="container">
+    @if(isRendered)
+    {
+        <CascadingValue Value="@this">
+            @ChildContent
+        </CascadingValue>
+    }
+    else
+    {
+        <p><em>Loading...</em></p>
+    }
+</div>
+
+@code {
+    private bool isRendered = false;
+
+    public ListPrefs listPrefs = new ListPrefs();
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var prefs = await sessionStorage.GetItemAsync<ListPrefs>("listPrefs");
+            if (prefs != null)
+                listPrefs = prefs;
+        }
+        isRendered = true;
+        StateHasChanged();
+    }
+
+    public async Task SavePrefsAsync()
+    {
+        await sessionStorage.SetItemAsync("listPrefs", listPrefs);
+    }
+}

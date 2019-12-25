@@ -1,0 +1,41 @@
+﻿@page "/contact/{Id:long}"
+@inject Services.ApiService apiService
+@using BlazorContacts.Shared.Models
+
+<h3>Contact @Id.ToString()</h3>
+
+@if (contact == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-sm-8 text-right">
+            <a href="/contact/@Id/edit" class="btn btn-sm btn-secondary">Edit</a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <h4>@contact.Name</h4>
+            <h4>@contact.PhoneNumber</h4>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <a href="/">Return to List</a>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public long Id { get; set; }
+
+    private Contact contact;
+
+    protected override async Task OnInitializedAsync()
+    {
+        contact = await apiService.GetContactByIdAsync(Id);
+    }
+}

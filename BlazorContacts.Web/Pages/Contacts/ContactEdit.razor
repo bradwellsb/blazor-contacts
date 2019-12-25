@@ -1,0 +1,70 @@
+﻿@page "/contact/{Id:long}/edit"
+@inject Services.ApiService apiService
+@inject NavigationManager NavManager
+@using System.Text.Json
+@using BlazorContacts.Shared.Models
+
+<h3>Edit Contact</h3>
+@if (contact == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-sm-8 text-right">
+            <a href="/contact/@contact.Id/delete">delete</a>
+        </div>
+    </div>
+    <div style="max-width: 400px;">
+        <EditForm Model="@contact" OnValidSubmit="@UpdateContact">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <div class="form-group row">
+                <label for="contactName" class="col-sm-6 col-form-label">Name:</label>
+                <input id="contactName" class="form-control col-sm-6 input-lg" type="text" disabled="@isSuccess"
+                       @bind="contact.Name" />
+            </div>
+            <div class="form-group row">
+                <label for="contactPhone" class="col-sm-6 col-form-label">Phone Number:</label>
+                <input id="contactPhone" class="form-control col-sm-6 input-lg" type="text" disabled="@isSuccess"
+                       @bind="contact.PhoneNumber" />
+            </div>
+            <button class="btn btn-primary" type="submit" disabled="@isSuccess">Submit</button>
+            <div class="alert @(isSuccess?"alert-success":"alert-danger")" style="margin-top:1rem" role="alert"
+                 hidden="@(message=="")">@message</div>
+            </EditForm>
+        </div>
+    }
+
+
+@code {
+    [Parameter]
+    public long Id { get; set; }
+
+    private bool isSuccess = false;
+    private string message = "";
+
+    private Contact contact;
+
+    protected override async Task OnInitializedAsync()
+    {
+        contact = await apiService.GetContactByIdAsync(Id);
+    }
+
+    public async void UpdateContact()
+    {
+        //returns response message, so can check if success
+        var response = await apiService.EditContactAsync(Id, contact);
+        if (response.IsSuccessStatusCode)
+        {
+            isSuccess = true;
+            message = $"Success";
+            //navigate to single page
+            //perhaps set flag (success) there that will display message if coming from this page
+        }
+        else
+            message = $"Error: {response.StatusCode.ToString()}. Please try again.";
+        this.StateHasChanged();
+    }
+}

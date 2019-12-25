@@ -28,7 +28,7 @@ namespace BlazorContacts.Auth
                     {
                         new Secret("thisismyclientspecificsecret".Sha256())
                     },
-                    AllowedScopes = { "blazorcontacts-api" }
+                    AllowedScopes = { "blazorcontacts-api" },
                 }
             };
         
