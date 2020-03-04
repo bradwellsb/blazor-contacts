@@ -36,13 +36,11 @@ namespace BlazorContacts.API
         {
             services.AddMvcCore(options =>
             {
-                options.EnableEndpointRouting = false;
                 var policy = new AuthorizationPolicyBuilder()
                     .RequireAuthenticatedUser()
                     .Build();
                 options.Filters.Add(new AuthorizeFilter(policy));
             });
-
 
             services.AddOData();
 
@@ -75,19 +73,11 @@ namespace BlazorContacts.API
             app.UseAuthentication();
             app.UseAuthorization();
 
-            /*
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllers();
-            });
-            */
-
-            app.UseMvc(routeBuilder =>
-            {
-                //routeBuilder.EnableDependencyInjection();
-                routeBuilder.Select().Filter().OrderBy().Expand().Count().MaxTop(50);
-                routeBuilder.MapODataServiceRoute("api", "api", GetEdmModel());
-            });
+                endpoints.Select().Filter().OrderBy().Expand().Count().MaxTop(50);
+                endpoints.MapODataRoute("api", "api", GetEdmModel());
+            });            
         }
 
         private IEdmModel GetEdmModel()
