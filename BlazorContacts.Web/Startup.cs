@@ -40,7 +40,7 @@ namespace BlazorContacts.Web
                 {
                     RequestUri = new Uri("http://localhost:5000/connect/token"),
                     ClientId = "blazorcontacts-web",
-                    ClientSecret = "thisismyclientspecificsecret"
+                    ClientSecret = "thisismyclientspecificsecret",
                 });
             });
 

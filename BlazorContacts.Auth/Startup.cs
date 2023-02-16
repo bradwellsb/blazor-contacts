@@ -24,8 +24,9 @@ namespace BlazorContacts.Auth
             //services.AddControllersWithViews();
 
             var builder = services.AddIdentityServer()
-                .AddInMemoryIdentityResources(Config.Ids)
-                .AddInMemoryApiResources(Config.Apis)
+                .AddInMemoryIdentityResources(Config.Ids)                
+                .AddInMemoryApiScopes(Config.Apis)
+                .AddInMemoryApiResources(Config.ApiResources)
                 .AddInMemoryClients(Config.Clients);
 
             // not recommended for production - you need to store your key material somewhere secure

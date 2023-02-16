@@ -11,10 +11,19 @@ namespace BlazorContacts.Auth
                 new IdentityResources.OpenId()
             };
 
-        public static IEnumerable<ApiResource> Apis =>
-            new ApiResource[] 
+        public static IEnumerable<ApiResource> ApiResources =>
+        new List<ApiResource>
+        {
+            new ApiResource("blazorcontacts-api")
             {
-                new ApiResource("blazorcontacts-api")
+                Scopes = {"blazorcontacts"}
+            }
+        };
+
+        public static IEnumerable<ApiScope> Apis =>
+            new List<ApiScope>
+            {
+                new ApiScope("blazorcontacts")
             };
         
         public static IEnumerable<Client> Clients =>
@@ -28,7 +37,7 @@ namespace BlazorContacts.Auth
                     {
                         new Secret("thisismyclientspecificsecret".Sha256())
                     },
-                    AllowedScopes = { "blazorcontacts-api" },
+                    AllowedScopes = { "blazorcontacts" },
                 }
             };
         

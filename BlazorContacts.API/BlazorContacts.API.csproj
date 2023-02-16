@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net70</TargetFramework>
     <ApplicationIcon />
     <OutputType>Exe</OutputType>
     <StartupObject />
@@ -9,16 +9,18 @@
 
   <ItemGroup>
     <PackageReference Include="IdentityServer4.AccessTokenValidation" Version="3.0.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.18" />
-    <PackageReference Include="Microsoft.AspNetCore.OData" Version="7.4.0-beta" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="3.1.1" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.1" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.1">
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.OData" Version="8.0.12" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="7.0.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.3">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="3.1.1" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" />
+    <PackageReference Include="Microsoft.OData.Edm" Version="7.14.1" />
+    <PackageReference Include="Microsoft.OData.ModelBuilder" Version="1.0.9" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="7.0.4" />
   </ItemGroup>
 
   <ItemGroup>

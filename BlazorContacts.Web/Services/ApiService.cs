@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System;
+using System.Net.Http.Json;
 
 namespace BlazorContacts.Web.Services
 {
@@ -33,33 +34,25 @@ namespace BlazorContacts.Web.Services
         {
             var response = await _httpClient.GetAsync($"api/contacts/{id}");
 
-            //Handle more gracefully
             response.EnsureSuccessStatusCode();
 
-            using var responseContent = await response.Content.ReadAsStreamAsync();
-            return await JsonSerializer.DeserializeAsync<Contact>(responseContent);
+            var responseContent = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<Contact>(responseContent);            
         }
 
         public async Task<HttpResponseMessage> DeleteContactByIdAsync(long id)
         {
-            //consider impact vs returning just status code
             return await _httpClient.DeleteAsync($"api/contacts/{id}");
         }
 
         public async Task<HttpResponseMessage> CreateContactAsync(Contact contact)
         {
-            string jsonContact = JsonSerializer.Serialize(contact);
-            var stringContent = new StringContent(jsonContact, System.Text.Encoding.UTF8, "application/json");
-
-            return await _httpClient.PostAsync($"api/contacts", stringContent);
+            return await _httpClient.PostAsJsonAsync($"api/contacts", contact);
         }
 
         public async Task<HttpResponseMessage> EditContactAsync(long id, Contact contact)
         {
-            string jsonContact = JsonSerializer.Serialize(contact);
-            var stringContent = new StringContent(jsonContact, System.Text.Encoding.UTF8, "application/json");
-
-            return await _httpClient.PatchAsync($"api/contacts/{id}", stringContent);
+            return await _httpClient.PutAsJsonAsync($"api/contacts/{id}", contact);
         }
     }
 }

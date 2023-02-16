@@ -5,8 +5,9 @@ using System.Threading.Tasks;
 using BlazorContacts.API.Data;
 using BlazorContacts.Shared.Models;
 using IdentityServer4.AccessTokenValidation;
-using Microsoft.AspNet.OData.Builder;
-using Microsoft.AspNet.OData.Extensions;
+using Microsoft.AspNetCore.OData;
+using Microsoft.OData.Edm;
+using Microsoft.OData.ModelBuilder;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -18,7 +19,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.OData.Edm;
+using System.Text.Json.Serialization;
 
 namespace BlazorContacts.API
 {
@@ -34,7 +35,13 @@ namespace BlazorContacts.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddOData();
+            services.AddControllers()
+                 .AddJsonOptions(o =>
+                 {
+                     o.JsonSerializerOptions.PropertyNamingPolicy = null;
+                 })
+                .AddOData(opt => opt.AddRouteComponents("api", GetEdmModel())
+                    .Select().Filter().OrderBy().Expand().Count().SetMaxTop(50));
 
             services.AddAuthentication("Bearer")
                 .AddIdentityServerAuthentication("Bearer", options =>
@@ -64,15 +71,10 @@ namespace BlazorContacts.API
 
             app.UseAuthentication();
             app.UseAuthorization();
-
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.Select().Filter().OrderBy().Expand().Count().MaxTop(50);
-                endpoints.MapODataRoute("api", "api", GetEdmModel());
-            });            
+            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }
 
-        private IEdmModel GetEdmModel()
+        private static IEdmModel GetEdmModel()
         {
             var builder = new ODataConventionModelBuilder();
             builder.EntitySet<Contact>("Contacts");

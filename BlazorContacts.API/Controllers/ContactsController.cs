@@ -6,18 +6,19 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using BlazorContacts.Shared.Models;
-using Microsoft.AspNet.OData.Routing;
-using Microsoft.AspNet.OData;
+using Microsoft.AspNetCore.OData.Query;
+using Microsoft.AspNetCore.OData.Routing.Attributes;
+using Microsoft.AspNetCore.OData.Routing.Controllers;
 using BlazorContacts.API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.OData.Deltas;
 
 namespace BlazorContacts.API.Controllers
 {
     [Authorize]
-    //[Route("api/[controller]")]
-    [ODataRoutePrefix("contacts")]
-    //[ApiController]
+    [Route("api/[controller]")]
+    [ApiController]
     public class ContactsController : ODataController
     {
         private readonly ContactsContext _context;
@@ -29,16 +30,14 @@ namespace BlazorContacts.API.Controllers
 
         // GET: api/contacts
         [EnableQuery(PageSize = 50)]
-        [ODataRoute]
-        public IQueryable<Contact> Get()
+        public IQueryable<Contact> GetContacts()
         {
             return _context.Contacts;
         }
 
-        // GET: api/contacts(5)
-        [EnableQuery]
-        [ODataRoute("({id})")]
-        public async Task<IActionResult> GetContact([FromODataUri] long id)
+        // GET: api/contacts/5
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetContact(long id)
         {
             if (!ModelState.IsValid)
             {
@@ -56,8 +55,8 @@ namespace BlazorContacts.API.Controllers
         }
 
         // POST: api/contacts
-        [ODataRoute]
-        public async Task<IActionResult> Post([FromBody] Contact contact)
+        [HttpPost]
+        public async Task<IActionResult> AddContact([FromBody] Contact contact)
         {
             if (!ModelState.IsValid)
             {
@@ -69,23 +68,29 @@ namespace BlazorContacts.API.Controllers
             return Created(contact.Id.ToString(), contact);
         }
 
-        // PATCH: api/contacts(5)
-        [ODataRoute("({id})")]
-        public async Task<IActionResult> Patch([FromODataUri] long id, [FromBody] Delta<Contact> updatedContact)
+        // PUT: api/contacts/5
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateContact(long id, [FromBody] Contact contact)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            var dbContact = await _context.Contacts.FindAsync(id);
-            if (dbContact == null)
+            if (id != contact.Id)
             {
-                return NotFound();
+                return BadRequest();
             }
-            updatedContact.Patch(dbContact);
+
             try
             {
+                var dbContact = await _context.Contacts.FindAsync(id);
+                if (dbContact == null)
+                {
+                    return NotFound();
+                }
+                _context.Entry(dbContact).CurrentValues.SetValues(contact);
                 await _context.SaveChangesAsync();
+                return Updated(dbContact);
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -98,12 +103,11 @@ namespace BlazorContacts.API.Controllers
                     throw;
                 }
             }
-            return Updated(dbContact);
         }
 
-        // DELETE: api/contacts(5)
-        [ODataRoute("({id})")]
-        public async Task<IActionResult> Delete([FromODataUri] long id)
+        // DELETE: api/contacts/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteContact(long id)
         {
             var site = await _context.Contacts.FindAsync(id);
             if (site == null)

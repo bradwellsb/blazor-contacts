@@ -3,9 +3,10 @@
 @using Models
 
     <div class="container">
-        <div class="row">
-            <div class="col-sm-8"></div>
-            <div class="col-sm-4 text-right"><a href="/contact/create" class="btn btn-primary">New Contact</a></div>
+        <div class="row mb-3">
+            <div class="col-12">
+            <div class="d-flex justify-content-end flex-row"><a href="/contact/create" class="btn btn-primary">New Contact</a></div>
+        </div>
         </div>
         @if (contacts == null)
         {
@@ -17,9 +18,9 @@
                 <div class="col-sm-8">
                     <h4>Showing @(skip + 1) - @(Math.Min(skip + ListPrefsProvider.listPrefs.NumResults, matchingCount)) of @matchingCount</h4>
                 </div>
-                <div class="col-sm-4 text-right">
-                    <div class="row form-group">
-                        <label for="sortBy" class="col-form-label col-form-label-sm col">Sort by:</label>
+                <div class="col-sm-4">
+                <div class="d-flex justify-content-end flex-row form-group">
+                        <label for="sortBy" class="col-form-label col-form-label-sm mr-2">Sort by:</label>
                         <select id="sortBy" class="form-control form-control-sm" style="width:auto;" @onchange="ChangeOrder">
                             <option value="Id" selected=@(ListPrefsProvider.listPrefs.OrderBy=="Id")>ID</option>
                             <option value="Name" selected=@(ListPrefsProvider.listPrefs.OrderBy=="Name")>Name (A - Z)</option>
